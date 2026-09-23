@@ -1,0 +1,26 @@
+{
+  "data": [
+    {
+      "id": "ACT-PROTOTYPE-100",
+      "name": "Sopa Fraterna",
+      "instituteId": "INST-PROTOTYPE-04",
+      "instituteName": "Instituto da Caridade",
+      "status": "ACTIVE",
+      "schedules": [
+        {
+          "id": "SCH-PROTOTYPE-001",
+          "dayOfWeek": 1,
+          "startTime": "18:00",
+          "endTime": "20:00",
+          "location": "Salão Principal"
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "page": 1,
+    "pageSize": 50,
+    "total": 1,
+    "totalPages": 1
+  }
+}

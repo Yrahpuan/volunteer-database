@@ -22,13 +22,22 @@ O endereço padrão é `http://127.0.0.1:3000`. As rotas `/health/live` e
 `/health/ready` verificam o processo HTTP e a conexão com o banco,
 respectivamente. Rotas de negócio serão adicionadas nos módulos de domínio.
 
+## Contratos de integração
+
+Os contratos TypeScript e exemplos JSON provisórios ficam em
+`src/integrations/erp/` e `src/integrations/crm/`. Tipos de IDs, alguns campos,
+enumerações, datas e paginação precisam ser confirmados quando recebermos as
+especificações reais das APIs.
+
 ### Verificações
 
 ```sh
 npm test
+npm run types:check
 ```
 
-Os testes verificam as entidades e restrições estruturais principais do schema.
+Os testes verificam o schema, regras de domínio e contratos do backend. O
+comando `types:check` valida as interfaces TypeScript.
 Para validar também a sintaxe com o Prisma CLI, configure `DATABASE_URL` (por
 exemplo, copiando `.env.example` para `.env`) e execute:
 

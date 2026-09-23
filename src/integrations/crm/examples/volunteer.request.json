@@ -1,0 +1,20 @@
+{
+  "crmPersonId": "CRM-PROTOTYPE-000123",
+  "fullName": "Pessoa de Exemplo",
+  "cpf": "00000000000",
+  "email": "pessoa@example.test",
+  "phone": "+5500000000000",
+  "birthDate": "1990-05-10",
+  "address": {
+    "street": "Rua de Exemplo",
+    "number": "100",
+    "complement": null,
+    "neighborhood": "Centro",
+    "city": "Cidade de Exemplo",
+    "state": "PI",
+    "postalCode": "00000000"
+  },
+  "volunteerType": "EFFECTIVE_MEMBER",
+  "source": "CRM",
+  "occurredAt": "2026-09-23T14:30:00-03:00"
+}
