@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "ERP_UNAVAILABLE",
+    "message": "ERP service temporarily unavailable"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "CRM_PERSON_CONFLICT",
+    "message": "CRM person is already associated with another volunteer"
+  }
+}

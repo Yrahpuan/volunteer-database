@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "ERP_ACTIVITY_NOT_FOUND",
+    "message": "Activity not found in ERP"
+  }
+}

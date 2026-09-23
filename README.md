@@ -27,7 +27,8 @@ respectivamente. Rotas de negócio serão adicionadas nos módulos de domínio.
 Os contratos TypeScript e exemplos JSON provisórios ficam em
 `src/integrations/erp/` e `src/integrations/crm/`. Tipos de IDs, alguns campos,
 enumerações, datas e paginação precisam ser confirmados quando recebermos as
-especificações reais das APIs.
+especificações reais das APIs. Os envelopes de erro definidos no documento
+também estão mapeados em `errors.ts` e têm exemplos JSON por status/código.
 
 ### Verificações
 

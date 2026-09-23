@@ -1,0 +1,9 @@
+{
+  "error": {
+    "code": "INVALID_PAYLOAD",
+    "message": "Request payload is invalid",
+    "fields": {
+      "cpf": "CPF is required"
+    }
+  }
+}

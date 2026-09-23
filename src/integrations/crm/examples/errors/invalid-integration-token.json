@@ -1,0 +1,6 @@
+{
+  "error": {
+    "code": "INVALID_INTEGRATION_TOKEN",
+    "message": "Invalid integration credentials"
+  }
+}
