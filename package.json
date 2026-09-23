@@ -5,6 +5,7 @@
   "description": "Esquema de dados do protótipo do Sistema de Voluntários",
   "scripts": {
     "test": "node --test",
+    "test:db": "node --env-file-if-exists=.env --test test/database.integration.test.js",
     "db:validate": "prisma validate --schema prisma/schema.prisma",
     "db:format": "prisma format --schema prisma/schema.prisma",
     "db:migrate": "prisma migrate dev --schema prisma/schema.prisma",

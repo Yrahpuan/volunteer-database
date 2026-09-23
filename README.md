@@ -24,6 +24,13 @@ npm run db:validate
 
 Essa validação não exige que o PostgreSQL esteja rodando.
 
+Os testes de integração exercitam as restrições reais do PostgreSQL. Com o banco
+local iniciado e as migrações aplicadas, execute:
+
+```sh
+npm run test:db
+```
+
 ### Banco local
 
 Copie `.env.example` para `.env` e inicie o PostgreSQL de protótipo:
