@@ -1,0 +1,212 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  INSTITUTE_COORDINATOR
+  VOLUNTEER
+}
+
+enum VolunteerType {
+  REGISTERED_MEMBER
+  EFFECTIVE_MEMBER
+}
+
+enum VolunteerActivityStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum ParticipationMode {
+  ALL_SCHEDULES
+  SELECTED_SCHEDULES
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  JUSTIFIED
+}
+
+enum DocumentStatus {
+  PENDING
+  VALID
+  EXPIRING
+  EXPIRED
+  REJECTED
+}
+
+enum DocumentAccessLevel {
+  VOLUNTEER
+  COORDINATOR
+  ADMIN
+}
+
+enum DocumentTypeCode {
+  BACKGROUND_CHECK
+  VOLUNTEER_AGREEMENT
+  LGPD_CONSENT
+  FOOD_HANDLING
+  DRIVER_RESPONSIBILITY
+  CONFIDENTIALITY
+  IMAGE_USAGE
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         UserRole
+  volunteerId  String?  @unique @map("volunteer_id") @db.Uuid
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  volunteer Volunteer? @relation(fields: [volunteerId], references: [id])
+  auditLogs AuditLog[]
+
+  @@map("users")
+}
+
+model Volunteer {
+  id                    String        @id @default(uuid()) @db.Uuid
+  crmPersonId           String?       @unique @map("crm_person_id")
+  fullName              String        @map("full_name")
+  cpf                   String        @unique
+  email                 String?
+  phone                 String?
+  birthDate             DateTime?     @map("birth_date") @db.Date
+  street                String?
+  number                String?
+  complement            String?
+  neighborhood          String?
+  city                  String?
+  state                 String?
+  postalCode            String?       @map("postal_code")
+  emergencyContactName  String?       @map("emergency_contact_name")
+  emergencyContactPhone String?       @map("emergency_contact_phone")
+  volunteerType         VolunteerType @map("volunteer_type")
+  isActive              Boolean       @default(true) @map("is_active")
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
+
+  user              User?
+  activities        VolunteerActivity[]
+  attendanceRecords AttendanceRecord[]
+  documents         Document[]
+
+  @@index([fullName])
+  @@index([crmPersonId])
+  @@index([volunteerType])
+  @@map("volunteers")
+}
+
+model VolunteerActivity {
+  id                  String                  @id @default(uuid()) @db.Uuid
+  volunteerId         String                  @map("volunteer_id") @db.Uuid
+  // External ERP reference. Deliberately has no local foreign key.
+  erpActivityId       String                  @map("erp_activity_id")
+  // ERP schedule IDs only; validated against ERP by the application.
+  selectedScheduleIds String[]                @map("selected_schedule_ids")
+  participationMode   ParticipationMode       @map("participation_mode")
+  status              VolunteerActivityStatus @default(ACTIVE)
+  startedAt           DateTime                @default(now()) @map("started_at")
+  endedAt             DateTime?               @map("ended_at")
+  createdAt           DateTime                @default(now()) @map("created_at")
+  updatedAt           DateTime                @updatedAt @map("updated_at")
+
+  volunteer         Volunteer          @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  attendanceRecords AttendanceRecord[]
+
+  @@unique([volunteerId, erpActivityId])
+  @@index([erpActivityId])
+  @@index([volunteerId, status])
+  @@map("volunteer_activities")
+}
+
+model AttendanceRecord {
+  id                  String           @id @default(uuid()) @db.Uuid
+  volunteerId         String           @map("volunteer_id") @db.Uuid
+  volunteerActivityId String           @map("volunteer_activity_id") @db.Uuid
+  // External ERP schedule reference. Deliberately has no local foreign key.
+  erpScheduleId       String           @map("erp_schedule_id")
+  occurrenceDate      DateTime         @map("occurrence_date") @db.Date
+  status              AttendanceStatus
+  notes               String?
+  recordedByUserId    String?          @map("recorded_by_user_id") @db.Uuid
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @updatedAt @map("updated_at")
+
+  volunteer         Volunteer         @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  volunteerActivity VolunteerActivity @relation(fields: [volunteerActivityId], references: [id], onDelete: Cascade)
+
+  @@unique([volunteerId, erpScheduleId, occurrenceDate])
+  @@index([volunteerId, occurrenceDate])
+  @@index([erpScheduleId, occurrenceDate])
+  @@map("attendance_records")
+}
+
+model DocumentType {
+  id                  String              @id @default(uuid()) @db.Uuid
+  code                DocumentTypeCode    @unique
+  name                String
+  description         String?
+  required            Boolean             @default(false)
+  defaultValidityDays Int?                @map("default_validity_days")
+  accessLevel         DocumentAccessLevel @default(ADMIN) @map("access_level")
+
+  documents Document[]
+
+  @@map("document_types")
+}
+
+model Document {
+  id                String         @id @default(uuid()) @db.Uuid
+  volunteerId       String         @map("volunteer_id") @db.Uuid
+  documentTypeId    String         @map("document_type_id") @db.Uuid
+  fileName          String         @map("file_name")
+  storageKey        String         @map("storage_key")
+  mimeType          String         @map("mime_type")
+  fileSize          Int            @map("file_size")
+  issueDate         DateTime?      @map("issue_date") @db.Date
+  expirationDate    DateTime?      @map("expiration_date") @db.Date
+  certificateNumber String?        @map("certificate_number")
+  status            DocumentStatus @default(PENDING)
+  uploadedAt        DateTime       @default(now()) @map("uploaded_at")
+  updatedAt         DateTime       @updatedAt @map("updated_at")
+
+  volunteer    Volunteer    @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  documentType DocumentType @relation(fields: [documentTypeId], references: [id])
+
+  @@index([volunteerId])
+  @@index([documentTypeId])
+  @@index([expirationDate])
+  @@index([status])
+  @@map("documents")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String?  @map("user_id") @db.Uuid
+  action    String
+  entity    String
+  entityId  String?  @map("entity_id")
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  metadata  Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
