@@ -23,3 +23,30 @@ npm run db:validate
 ```
 
 Essa validação não exige que o PostgreSQL esteja rodando.
+
+### Banco local
+
+Copie `.env.example` para `.env` e inicie o PostgreSQL de protótipo:
+
+```sh
+docker compose up -d db
+```
+
+Com o banco iniciado, aplique a migração em desenvolvimento com:
+
+```sh
+npm run db:migrate
+```
+
+Para aplicar as migrações já criadas em um ambiente de deploy, use:
+
+```sh
+npm run db:deploy
+```
+
+Para parar o banco mantendo os dados locais, execute `docker compose down`.
+
+A migração inicial está em `prisma/migrations/20260923190000_init/` e foi
+gerada a partir do schema Prisma. Não inclui dados iniciais para tipos de
+documento porque o documento de requisitos ainda não especifica quais tipos
+são obrigatórios nem suas regras de validade.
