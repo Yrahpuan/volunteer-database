@@ -1,6 +1,7 @@
 const { createServer } = require('node:http');
 const { live, ready } = require('./modules/health/health.controller');
 const { sendJson } = require('./shared/http/json-response');
+const { crmVolunteer } = require('./integrations/crm/crm.controller');
 
 function validateDependencies({ prisma }) {
   if (!prisma || typeof prisma.$queryRaw !== 'function') {
@@ -8,9 +9,15 @@ function validateDependencies({ prisma }) {
   }
 }
 
-async function handleRequest(request, response, { prisma }) {
+async function handleRequest(request, response, dependencies) {
+  const { prisma } = dependencies;
   try {
     const pathname = new URL(request.url, 'http://localhost').pathname;
+
+    if (pathname === '/api/integrations/crm/volunteers') {
+      await crmVolunteer(request, response, dependencies);
+      return;
+    }
 
     if (pathname === '/health/live') {
       if (request.method !== 'GET') {

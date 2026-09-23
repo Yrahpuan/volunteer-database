@@ -1,5 +1,8 @@
 const { PrismaClient } = require('@prisma/client');
 const { createApp } = require('./app');
+const { createClient } = require('redis');
+const { RedisCrmIdempotencyStore } = require('./integrations/crm/idempotency-store');
+const { createCrmVolunteerService } = require('./integrations/crm/crm-volunteer.service');
 
 function readPort(value) {
   const port = Number(value ?? 3000);
@@ -9,15 +12,30 @@ function readPort(value) {
   return port;
 }
 
-function startServer({ env = process.env, logger = console } = {}) {
+async function startServer({ env = process.env, logger = console } = {}) {
   const port = readPort(env.PORT);
   const host = env.HOST || '127.0.0.1';
+  const idempotencyTtlSeconds = Number(env.CRM_IDEMPOTENCY_TTL_SECONDS ?? 86400);
+  if (!Number.isInteger(idempotencyTtlSeconds) || idempotencyTtlSeconds < 1) {
+    throw new RangeError('CRM_IDEMPOTENCY_TTL_SECONDS must be a positive integer.');
+  }
   const prisma = new PrismaClient();
-  const server = createApp({ prisma });
+  const redis = createClient({ url: env.REDIS_URL || 'redis://127.0.0.1:6379' });
+  redis.on('error', (error) => logger.error('Redis client error.', error));
+  try {
+    await redis.connect();
+  } catch (error) {
+    await prisma.$disconnect();
+    throw error;
+  }
+  const idempotencyStore = new RedisCrmIdempotencyStore(redis, { ttlSeconds: idempotencyTtlSeconds });
+  const crmVolunteerService = createCrmVolunteerService({ prisma, idempotencyStore });
+  const server = createApp({ prisma, redis, crmVolunteerService, crmIntegrationToken: env.CRM_INTEGRATION_TOKEN });
 
   server.on('error', async (error) => {
     logger.error('HTTP server failed to start.', error);
     await prisma.$disconnect();
+    await redis.quit();
     process.exitCode = 1;
   });
 
@@ -38,6 +56,7 @@ function startServer({ env = process.env, logger = console } = {}) {
     server.close(async (error) => {
       try {
         await prisma.$disconnect();
+        await redis.quit();
         if (error) {
           logger.error('HTTP server did not close cleanly.', error);
           process.exitCode = 1;
@@ -52,9 +71,13 @@ function startServer({ env = process.env, logger = console } = {}) {
 }
 
 if (require.main === module) {
-  const { shutdown } = startServer();
-  process.once('SIGINT', () => shutdown('SIGINT'));
-  process.once('SIGTERM', () => shutdown('SIGTERM'));
+  startServer().then(({ shutdown }) => {
+    process.once('SIGINT', () => shutdown('SIGINT'));
+    process.once('SIGTERM', () => shutdown('SIGTERM'));
+  }).catch((error) => {
+    console.error('Could not start the volunteer backend.', error);
+    process.exitCode = 1;
+  });
 }
 
 module.exports = { readPort, startServer };

@@ -27,6 +27,12 @@ const crmPersonConflict: CrmErrorsByStatus[409] = {
 const crmInvalidToken: CrmErrorsByStatus[401] = {
   error: { code: 'INVALID_INTEGRATION_TOKEN', message: 'Invalid integration credentials' },
 };
+const crmIdempotencyConflict: CrmErrorsByStatus[409] = {
+  error: { code: 'IDEMPOTENCY_KEY_CONFLICT', message: 'Idempotency key is already in use' },
+};
+const crmUnavailable: CrmErrorsByStatus[503] = {
+  error: { code: 'CRM_INTEGRATION_UNAVAILABLE', message: 'CRM integration is temporarily unavailable' },
+};
 
 void [
   erpUnauthorized,
@@ -35,4 +41,6 @@ void [
   crmInvalidPayload,
   crmPersonConflict,
   crmInvalidToken,
+  crmIdempotencyConflict,
+  crmUnavailable,
 ];

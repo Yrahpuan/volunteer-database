@@ -20,7 +20,8 @@ npm start
 
 O endereço padrão é `http://127.0.0.1:3000`. As rotas `/health/live` e
 `/health/ready` verificam o processo HTTP e a conexão com o banco,
-respectivamente. Rotas de negócio serão adicionadas nos módulos de domínio.
+respectivamente. O POST de integração CRM está disponível no caminho descrito
+abaixo.
 
 ## Contratos de integração
 
@@ -29,6 +30,14 @@ Os contratos TypeScript e exemplos JSON provisórios ficam em
 enumerações, datas e paginação precisam ser confirmados quando recebermos as
 especificações reais das APIs. Os envelopes de erro definidos no documento
 também estão mapeados em `errors.ts` e têm exemplos JSON por status/código.
+
+O endpoint `POST /api/integrations/crm/volunteers` recebe o payload do documento
+e usa `Authorization: Bearer ...` (`CRM_INTEGRATION_TOKEN`). `Idempotency-Key` é
+obrigatória; o protótipo guarda o resultado no Redis por 24 horas
+(`CRM_IDEMPOTENCY_TTL_SECONDS`) e rejeita chave repetida com outro corpo ou
+enquanto a primeira operação está em andamento. A duração, validação do CPF,
+campos atualizados e status de criação/atualização são decisões provisórias a
+confirmar com a equipe do CRM.
 
 O cliente ERP e o serviço de cache-aside ficam em `src/integrations/erp/`.
 Rota, filtros, cabeçalho de autenticação e rota por ID são configuráveis; os
@@ -69,10 +78,10 @@ npm run test:cache
 
 ### Banco local
 
-Copie `.env.example` para `.env` e inicie o PostgreSQL de protótipo:
+Copie `.env.example` para `.env` e inicie PostgreSQL e Redis de protótipo:
 
 ```sh
-docker compose up -d db
+docker compose up -d db cache
 ```
 
 Com o banco iniciado, aplique a migração em desenvolvimento com:
