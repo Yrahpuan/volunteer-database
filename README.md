@@ -30,6 +30,10 @@ enumerações, datas e paginação precisam ser confirmados quando recebermos as
 especificações reais das APIs. Os envelopes de erro definidos no documento
 também estão mapeados em `errors.ts` e têm exemplos JSON por status/código.
 
+O cliente ERP e o serviço de cache-aside ficam em `src/integrations/erp/`.
+Rota, filtros, cabeçalho de autenticação e rota por ID são configuráveis; os
+valores do `.env.example` são apenas propostas para o protótipo.
+
 ### Verificações
 
 ```sh
@@ -53,6 +57,14 @@ local iniciado e as migrações aplicadas, execute:
 
 ```sh
 npm run test:db
+```
+
+Para testar TTL e leitura/escrita no Redis real, inicie o serviço `cache` e
+execute:
+
+```sh
+docker compose up -d cache
+npm run test:cache
 ```
 
 ### Banco local

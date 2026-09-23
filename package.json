@@ -6,6 +6,7 @@
   "scripts": {
     "test": "node --test",
     "test:db": "node --env-file-if-exists=.env --test test/database.integration.test.js",
+    "test:cache": "node --env-file-if-exists=.env --test test/cache.integration.test.js",
     "dev": "node --env-file-if-exists=.env --watch src/server.js",
     "start": "node --env-file-if-exists=.env src/server.js",
     "types:check": "tsc --project tsconfig.json",
@@ -19,6 +20,7 @@
     "typescript": "^7.0.2"
   },
   "dependencies": {
-    "@prisma/client": "^6.19.3"
+    "@prisma/client": "^6.19.3",
+    "redis": "^6.2.1"
   }
 }

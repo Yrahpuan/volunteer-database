@@ -1,5 +1,11 @@
 import type { CrmVolunteerPayload, CrmVolunteerResponse } from '../src/integrations/crm/contracts';
-import type { ErpActivitiesResponse } from '../src/integrations/erp/contracts';
+import type { ErpActivitiesResponse, GetActivitiesParams } from '../src/integrations/erp/contracts';
+
+const erpQuery: GetActivitiesParams = {
+  page: 1,
+  pageSize: 50,
+  filters: { status: 'ACTIVE', instituteId: 'INST-PROTOTYPE-04' },
+};
 
 const erpActivities: ErpActivitiesResponse = {
   data: [{
@@ -49,4 +55,4 @@ const crmResponse: CrmVolunteerResponse = {
   createdAt: '2026-09-23T17:30:00Z',
 };
 
-void [erpActivities, crmRequest, crmResponse];
+void [erpQuery, erpActivities, crmRequest, crmResponse];

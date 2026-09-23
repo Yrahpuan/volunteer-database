@@ -5,6 +5,13 @@
  */
 export type ErpActivityStatus = 'ACTIVE' | 'INACTIVE';
 
+/** Provisional query shape; confirm supported filters and names with the ERP. */
+export interface GetActivitiesParams {
+  page?: number;
+  pageSize?: number;
+  filters?: Record<string, string | number | boolean>;
+}
+
 export interface ErpActivitySchedule {
   /** Provisional string ID; the ERP's actual ID format is not yet known. */
   id: string;
