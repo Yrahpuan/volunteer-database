@@ -18,6 +18,13 @@ const crmInvalidPayload: CrmErrorsByStatus[400] = {
     fields: { cpf: 'CPF is required' },
   },
 };
+const crmPayloadTooLarge: CrmErrorsByStatus[413] = {
+  error: {
+    code: 'INVALID_PAYLOAD',
+    message: 'Request payload is too large',
+    fields: { body: 'Maximum size is 1 MB' },
+  },
+};
 const crmPersonConflict: CrmErrorsByStatus[409] = {
   error: {
     code: 'CRM_PERSON_CONFLICT',
@@ -39,6 +46,7 @@ void [
   erpActivityNotFound,
   erpUnavailable,
   crmInvalidPayload,
+  crmPayloadTooLarge,
   crmPersonConflict,
   crmInvalidToken,
   crmIdempotencyConflict,
