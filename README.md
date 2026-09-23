@@ -8,6 +8,20 @@ sendo propriedade do ERP: o banco local guarda apenas seus identificadores
 externos. As regras que consultam o ERP serão implementadas na aplicação quando
 os contratos reais estiverem disponíveis.
 
+## Backend
+
+Com `.env` configurado, inicie o servidor em modo de desenvolvimento ou normal:
+
+```sh
+npm run dev
+# ou
+npm start
+```
+
+O endereço padrão é `http://127.0.0.1:3000`. As rotas `/health/live` e
+`/health/ready` verificam o processo HTTP e a conexão com o banco,
+respectivamente. Rotas de negócio serão adicionadas nos módulos de domínio.
+
 ### Verificações
 
 ```sh

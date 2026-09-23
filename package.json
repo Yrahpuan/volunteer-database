@@ -6,6 +6,8 @@
   "scripts": {
     "test": "node --test",
     "test:db": "node --env-file-if-exists=.env --test test/database.integration.test.js",
+    "dev": "node --env-file-if-exists=.env --watch src/server.js",
+    "start": "node --env-file-if-exists=.env src/server.js",
     "db:validate": "prisma validate --schema prisma/schema.prisma",
     "db:format": "prisma format --schema prisma/schema.prisma",
     "db:migrate": "prisma migrate dev --schema prisma/schema.prisma",
